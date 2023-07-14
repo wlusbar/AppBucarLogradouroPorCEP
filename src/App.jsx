@@ -1,9 +1,34 @@
 import { useState } from 'react'
 import './App.css'
 import {FiSearch} from 'react-icons/fi';
+import api from './services/api';
+ 
 
+
+
+  
 function App() {
-  const [count, setCount] = useState(0)
+  const [input, setInput] = useState("");
+  const [cep,setCEP] = useState({})
+
+ async function clicou(){
+    //!input > 0 && alert("Preencher cep");
+   
+    if(input.length === 0){
+      alert("Preencher cep");
+      return;
+    }
+
+      try{
+        const response = await api.get(`${input}/json`);
+        setCEP(response.data)
+        setInput("");
+      }catch{
+        alert("Erro ao Buscar Logradouro");
+        setInput("");
+      }
+  }
+
 
   return (
     <>
@@ -13,22 +38,26 @@ function App() {
           <div className='containerInput'>
             <input 
             type="text" 
-            placeholder='Digite o CEP'            
+            placeholder='Digite o CEP' 
+            value={input}  
+            onChange={(e)=>setInput(e.target.value)}         
             />
 
-            <button className='buttonSeach'>
+            <button className='buttonSeach' onClick={clicou}>
               <FiSearch size={25} color="#FFF" />
             </button>
           </div>
 
-          <main className='main'>
-            <h2>CEP: 00000</h2>
+          {Object.keys(cep).length > 0 && (
+            <main className='main'>
+            <h2>CEP: {cep.cep}</h2>
 
-            <span>nome da rua</span>
-            <span>Complementos</span>
-            <span>Bairro</span>
-            <span>Cidade</span>
+            <span>{cep.logradouro},{cep.complemento}</span>
+            <span>{cep.bairro}</span>
+            <span>{cep.localidade}-{cep.uf}</span>
           </main>
+          )}
+          
 
       </div>
       
